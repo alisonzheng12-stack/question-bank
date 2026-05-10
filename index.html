@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>&#21047;&#38988;&#21191;&#32773;</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <aside class="question-bank">
+        <section class="panel editor">
+          <h2>&#33258;&#35330;&#38988;&#24235;</h2>
+          <form id="singleQuestionForm" class="single-question-form">
+            <label>
+              <span>&#31185;&#30446; / &#20027;&#38988;</span>
+              <select id="singleTopicInput"></select>
+            </label>
+            <label>
+              <span>&#38988;&#30446;</span>
+              <textarea id="singleQuestionInput" rows="3" placeholder="&#36664;&#20837;&#38988;&#30446;"></textarea>
+            </label>
+            <p id="duplicateQuestionNotice" class="duplicate-warning" aria-live="polite"></p>
+            <div class="choice-editor">
+              <label>
+                <span>A</span>
+                <input id="choiceAInput" type="text" />
+              </label>
+              <label>
+                <span>B</span>
+                <input id="choiceBInput" type="text" />
+              </label>
+              <label>
+                <span>C</span>
+                <input id="choiceCInput" type="text" />
+              </label>
+              <label>
+                <span>D</span>
+                <input id="choiceDInput" type="text" />
+              </label>
+            </div>
+            <label>
+              <span>&#27491;&#30906;&#31572;&#26696;</span>
+              <select id="singleAnswerInput">
+                <option value="0">A</option>
+                <option value="1">B</option>
+                <option value="2">C</option>
+                <option value="3">D</option>
+              </select>
+            </label>
+            <label>
+              <span>&#35443;&#35299;</span>
+              <textarea id="singleExplanationInput" rows="4" placeholder="可輸入關鍵觀念、正解理由、易錯選項比較或法條出處"></textarea>
+            </label>
+            <button id="addQuestionBtn" type="submit">&#26032;&#22686;&#38988;&#30446;</button>
+          </form>
+          <div class="bulk-question-import">
+            <h3>&#25209;&#37327;&#36664;&#20837;&#38988;&#30446;</h3>
+            <textarea
+              id="bulkQuestionInput"
+              rows="8"
+              placeholder="把 Word 裡的多題貼在這裡。"
+            ></textarea>
+            <div class="bulk-format-guide">
+              <strong>&#26684;&#24335;&#31684;&#26412;</strong>
+              <pre>1. 題目文字
+A. 選項一
+B. 選項二
+C. 選項三
+D. 選項四
+答案：B
+詳解：可省略
+
+2. 下一題題目
+(A) 選項一
+(B) 選項二
+(C) 選項三
+(D) 選項四
+正解：D</pre>
+            </div>
+            <button id="bulkImportBtn" type="button">&#25209;&#37327;&#36617;&#20837;</button>
+          </div>
+          <p id="questionEditorStatus" class="hint" aria-live="polite"></p>
+          <div class="question-manager">
+            <div class="shop-row">
+              <h3>&#30446;&#21069;&#38988;&#30446;</h3>
+              <span id="questionCount" class="hint">0</span>
+            </div>
+            <div id="questionList" class="question-list" aria-label="custom question list"></div>
+          </div>
+          <textarea id="questionInput" spellcheck="false" aria-label="custom question bank JSON"></textarea>
+          <div class="editor-actions">
+            <button id="loadQuestionsBtn" type="button">&#36617;&#20837;&#38988;&#24235;</button>
+            <button id="importBackupBtn" type="button">&#21295;&#20837;&#20633;&#20221;</button>
+            <button id="sampleBtn" type="button">&#31684;&#20363;&#26684;&#24335;</button>
+          </div>
+          <input id="backupFileInput" type="file" accept="application/json,.json" hidden />
+          <p class="hint">JSON array. Each item needs question, choices, answer, and optional topic. answer starts from 0.</p>
+        </section>
+      </aside>
+      <section class="arena" aria-label="battle area">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Quiz RPG</p>
+            <h1>&#21047;&#38988;&#21191;&#32773;</h1>
+          </div>
+          <div class="top-actions">
+            <button id="connectDbBtn" type="button">&#36899;&#25509;&#36039;&#26009;&#24235;</button>
+            <button id="loadDbBtn" type="button">&#35712;&#21462;&#36039;&#26009;&#24235;</button>
+            <button id="manualSaveBtn" type="button">&#23384;&#27284;</button>
+            <button id="toggleExtraBtn" type="button">&#26356;&#22810;&#21151;&#33021;</button>
+            <span id="saveStatus" class="save-status" aria-live="polite"></span>
+            <button id="resetBtn" class="icon-button" type="button" title="Reset progress" aria-label="Reset progress">
+              R
+            </button>
+          </div>
+        </header>
+
+        <div class="battlefield">
+          <article class="hero panel">
+            <div class="equipment-rig">
+              <div id="equipmentSlots" class="equipment-slots" aria-label="equipment slots"></div>
+              <div id="paperDoll" class="paper-doll" aria-hidden="true"></div>
+            </div>
+            <div>
+              <p class="label">&#21191;&#32773;</p>
+              <h2 id="heroName">&#20320;</h2>
+            </div>
+            <dl class="stats">
+              <div>
+                <dt>Lv</dt>
+                <dd id="level">1</dd>
+              </div>
+              <div>
+                <dt>EXP</dt>
+                <dd><span id="xp">0</span>/<span id="xpNeed">100</span></dd>
+              </div>
+              <div>
+                <dt>&#36899;&#25802;</dt>
+                <dd id="streak">0</dd>
+              </div>
+              <div>
+                <dt>&#25216;&#33021;</dt>
+                <dd>Lv <span id="skillLevel">1</span></dd>
+              </div>
+            </dl>
+            <div class="bar skill" aria-label="skill experience">
+              <span id="skillBar"></span>
+            </div>
+            <p class="hint skill-hint">&#25216;&#33021; EXP <span id="skillXp">0</span>/<span id="skillXpNeed">50</span></p>
+            <div class="bar" aria-label="experience">
+              <span id="xpBar"></span>
+            </div>
+          </article>
+
+          <article class="monster panel">
+            <div class="sprite monster-sprite" id="monsterSprite" aria-hidden="true">M1</div>
+            <div>
+              <p class="label">&#30446;&#21069;&#24618;&#29289;</p>
+              <h2 id="monsterName">&#21490;&#33802;&#22982;</h2>
+            </div>
+            <dl class="stats">
+              <div>
+                <dt>HP</dt>
+                <dd><span id="monsterHp">60</span>/<span id="monsterMaxHp">60</span></dd>
+              </div>
+              <div>
+                <dt>&#29518;&#21237;</dt>
+                <dd><span id="monsterXp">25</span> EXP</dd>
+              </div>
+            </dl>
+            <div class="bar health" aria-label="monster health">
+              <span id="hpBar"></span>
+            </div>
+          </article>
+        </div>
+
+        <section class="manual panel" aria-label="adventure handbook">
+          <div class="section-head">
+            <h2>&#20882;&#38570;&#25163;&#20874;</h2>
+            <span id="manualRank">F</span>
+          </div>
+          <div id="manualTabs" class="manual-tabs"></div>
+          <div id="manualContent" class="manual-content"></div>
+        </section>
+
+        <section class="question panel" aria-label="quiz question">
+          <div class="question-meta">
+            <span id="topicTag">&#22522;&#30990;&#38988;</span>
+            <span>&#31532; <b id="questionNo">1</b> &#38988;</span>
+            <span id="mvpTimer" class="mvp-timer" hidden>MVP 40s</span>
+          </div>
+          <h2 id="questionText">Loading...</h2>
+          <div id="choices" class="choices"></div>
+          <p id="feedback" class="feedback" aria-live="polite"></p>
+          <div id="explanationPanel" class="explanation-panel" hidden></div>
+        </section>
+
+        <section class="gacha-area">
+          <section class="panel wish-panel">
+            <div class="shop-row">
+              <h2>&#25277;&#21345;&#27231;</h2>
+              <button id="wishPullBtn" type="button">&#25277;&#19968;&#27425; 160</button>
+            </div>
+            <p id="wishInfo" class="hint"></p>
+            <div id="wishRewards" class="gacha-pool" aria-label="wish rewards"></div>
+          </section>
+
+          <section class="panel gacha-panel">
+            <div class="shop-row">
+              <h2>&#25197;&#34507;&#27231;</h2>
+              <button id="gachaPullBtn" type="button">&#21934;&#25277; 80</button>
+            </div>
+            <p id="gachaMonth" class="hint"></p>
+            <div id="gachaPool" class="gacha-pool" aria-label="monthly gacha pool"></div>
+          </section>
+
+          <section class="panel card-gacha-panel">
+            <div class="shop-row">
+              <h2>&#25197;&#34507;&#27231;2</h2>
+              <button id="cardGachaPullBtn" type="button">&#25277;&#21345; 80</button>
+            </div>
+            <p id="cardGachaInfo" class="hint"></p>
+            <div id="cardGachaPool" class="gacha-pool" aria-label="card gacha pool"></div>
+          </section>
+        </section>
+      </section>
+
+      <aside class="side">
+        <section class="panel daily-panel">
+          <div class="shop-row">
+            <h2>&#27599;&#26085;&#20219;&#21209;</h2>
+            <button id="dailyNpcBtn" type="button">NPC +20</button>
+          </div>
+          <p id="dailyDate" class="hint"></p>
+          <div id="dailyMissions" class="daily-missions" aria-label="daily missions"></div>
+        </section>
+
+        <section class="dungeons panel" aria-label="dungeons">
+          <div class="section-head">
+            <h2>&#21103;&#26412;</h2>
+            <span id="currentDungeonLabel">&#34892;&#25919;&#27861;</span>
+          </div>
+          <div id="dungeonList" class="dungeon-list"></div>
+        </section>
+
+        <section class="panel">
+          <h2>&#25136;&#32318;</h2>
+          <dl class="record">
+            <div>
+              <dt>&#31572;&#23565;</dt>
+              <dd id="correctCount">0</dd>
+            </div>
+            <div>
+              <dt>&#31572;&#37679;</dt>
+              <dd id="wrongCount">0</dd>
+            </div>
+            <div>
+              <dt>&#25802;&#25943;</dt>
+              <dd id="defeatedCount">0</dd>
+            </div>
+            <div>
+              <dt>&#27491;&#30906;&#29575;</dt>
+              <dd id="accuracy">0%</dd>
+            </div>
+          </dl>
+        </section>
+
+        <section class="panel rewards">
+          <h2>&#29518;&#21237;</h2>
+          <dl class="wallet">
+            <div>
+              <dt>&#37329;&#24163;</dt>
+              <dd id="coins">0</dd>
+            </div>
+            <div>
+              <dt>&#23542;&#30707;</dt>
+              <dd id="gems">0</dd>
+            </div>
+            <div>
+              <dt>&#31934;&#38728;&#23542;&#37978;</dt>
+              <dd id="elfDiamonds">0</dd>
+            </div>
+          </dl>
+          <div class="inventory" aria-label="inventory">
+            <div><span>HP</span><b id="potionCount">0</b></div>
+            <div><span>XP</span><b id="scrollCount">0</b></div>
+            <div><span>KEY</span><b id="keyCount">0</b></div>
+          </div>
+          <ul id="rewardLog" class="reward-log" aria-live="polite"></ul>
+        </section>
+
+        <section class="panel study-panel">
+          <div class="shop-row">
+            <h2>&#23416;&#32722;&#35336;&#26178;</h2>
+            <button id="studyToggleBtn" type="button">&#38283;&#22987;</button>
+          </div>
+          <dl class="study-stats">
+            <div>
+              <dt>&#32047;&#31309;</dt>
+              <dd id="studyTime">00:00</dd>
+            </div>
+          </dl>
+        </section>
+
+        <section class="panel equipment-panel">
+          <h2>&#32972;&#21253;</h2>
+          <div class="shop-row">
+            <h3>&#24618;&#29289;&#25481;&#33853;</h3>
+            <button id="sellAllBtn" type="button">&#20840;&#37096;&#36067;&#20986;</button>
+          </div>
+          <div class="bag-tools" aria-label="bag filters">
+            <input id="bagSearchInput" type="search" placeholder="搜尋背包" />
+            <select id="bagCategoryInput">
+              <option value="all">全部</option>
+              <option value="equipment">裝備</option>
+              <option value="card">卡片</option>
+              <option value="headgear">頭飾</option>
+              <option value="material">材料</option>
+              <option value="refine">精煉</option>
+              <option value="mvp">MVP材料</option>
+            </select>
+          </div>
+          <div id="dropInventory" class="drop-inventory" aria-label="drop inventory"></div>
+          <div class="bag-divider"></div>
+          <h3 class="bag-heading">&#35037;&#20633;&#24037;&#22346;</h3>
+          <div id="weaponForge" class="weapon-forge" aria-label="equipment forge"></div>
+          <div class="bag-divider"></div>
+          <div class="blacksmith-npc">
+            <div class="blacksmith-avatar" aria-hidden="true">鐵</div>
+            <div>
+              <h3 class="bag-heading">鐵匠NPC</h3>
+              <p class="hint">裝備、精煉、修復都交給鐵匠處理。</p>
+            </div>
+          </div>
+          <div id="equipmentBag" class="equipment-bag blacksmith-list" aria-label="blacksmith refinement list"></div>
+        </section>
+      </aside>
+    </main>
+
+    <script src="nippon-colors.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
