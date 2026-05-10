@@ -1,344 +1,476 @@
-<!doctype html>
-<html lang="zh-Hant">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>&#21047;&#38988;&#21191;&#32773;</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <main class="app">
-      <aside class="question-bank">
-        <section class="panel editor">
-          <h2>&#33258;&#35330;&#38988;&#24235;</h2>
-          <form id="singleQuestionForm" class="single-question-form">
-            <label>
-              <span>&#31185;&#30446; / &#20027;&#38988;</span>
-              <select id="singleTopicInput"></select>
-            </label>
-            <label>
-              <span>&#38988;&#30446;</span>
-              <textarea id="singleQuestionInput" rows="3" placeholder="&#36664;&#20837;&#38988;&#30446;"></textarea>
-            </label>
-            <p id="duplicateQuestionNotice" class="duplicate-warning" aria-live="polite"></p>
-            <div class="choice-editor">
-              <label>
-                <span>A</span>
-                <input id="choiceAInput" type="text" />
-              </label>
-              <label>
-                <span>B</span>
-                <input id="choiceBInput" type="text" />
-              </label>
-              <label>
-                <span>C</span>
-                <input id="choiceCInput" type="text" />
-              </label>
-              <label>
-                <span>D</span>
-                <input id="choiceDInput" type="text" />
-              </label>
-            </div>
-            <label>
-              <span>&#27491;&#30906;&#31572;&#26696;</span>
-              <select id="singleAnswerInput">
-                <option value="0">A</option>
-                <option value="1">B</option>
-                <option value="2">C</option>
-                <option value="3">D</option>
-              </select>
-            </label>
-            <label>
-              <span>&#35443;&#35299;</span>
-              <textarea id="singleExplanationInput" rows="4" placeholder="可輸入關鍵觀念、正解理由、易錯選項比較或法條出處"></textarea>
-            </label>
-            <button id="addQuestionBtn" type="submit">&#26032;&#22686;&#38988;&#30446;</button>
-          </form>
-          <div class="bulk-question-import">
-            <h3>&#25209;&#37327;&#36664;&#20837;&#38988;&#30446;</h3>
-            <textarea
-              id="bulkQuestionInput"
-              rows="8"
-              placeholder="把 Word 裡的多題貼在這裡。"
-            ></textarea>
-            <div class="bulk-format-guide">
-              <strong>&#26684;&#24335;&#31684;&#26412;</strong>
-              <pre>1. 題目文字
-A. 選項一
-B. 選項二
-C. 選項三
-D. 選項四
-答案：B
-詳解：可省略
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>法學緒論筆記 | 22堂課</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--fs:13px;--bg:#f9f8f6;--sur:#fff;--sur2:#f4f3ef;--bor:#e8e5de;--bor2:#d4d0c8;--txt:#1c1c1a;--txt2:#5a5955;--txt3:#9a9890;--acc:#0a6148;--acc-l:#e8f5f0;--grn:#0a6148;--grn-l:#e8f5f0;--orn:#9a6010;--orn-l:#fdf3e0;--red:#8a3218;--red-l:#fdf0ec;--r:8px}
+body{font-family:-apple-system,"PingFang TC","Helvetica Neue",sans-serif;background:var(--bg);color:var(--txt);height:100vh;overflow:hidden;font-size:var(--fs);line-height:1.65}
+.app{display:flex;height:100vh}
+.sb{width:272px;min-width:272px;background:var(--sur);border-right:1px solid var(--bor);display:flex;flex-direction:column;overflow:hidden}
+.sb-top{padding:18px 16px 0;flex-shrink:0}
+.sb-logo{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.sb-icon{width:30px;height:30px;background:var(--acc);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.08em;flex-shrink:0;font-weight:700}
+.sb-name{font-size:1.08em;font-weight:700;color:var(--txt)}.sb-sub{font-size:0.85em;color:var(--txt3)}
+.prog-wrap{background:var(--sur2);border-radius:var(--r);padding:10px 12px;margin-bottom:12px}
+.prog-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.prog-lbl{font-size:0.85em;color:var(--txt2);font-weight:500}.prog-num{font-size:0.85em;color:var(--acc);font-weight:600}
+.prog-bar{height:4px;background:var(--bor);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:var(--acc);border-radius:2px;transition:width .4s}
+.search-wrap{position:relative;margin-bottom:10px}
+.search-ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--txt3);pointer-events:none}
+#si{width:100%;padding:7px 10px 7px 30px;border:1px solid var(--bor);border-radius:var(--r);background:var(--sur2);color:var(--txt);font-size:0.92em;outline:none;transition:.15s}
+#si:focus{border-color:var(--acc);background:var(--sur)}#si::placeholder{color:var(--txt3)}
+.ftabs{display:flex;gap:4px;padding:0 0 10px;border-bottom:1px solid var(--bor)}
+.ftab{flex:1;padding:5px 4px;border:1px solid var(--bor);border-radius:6px;background:none;color:var(--txt2);font-size:0.85em;cursor:pointer;transition:.15s;text-align:center}
+.ftab:hover,.ftab.on{background:var(--acc-l);border-color:var(--acc);color:var(--acc);font-weight:500}
+.list{overflow-y:auto;flex:1;padding:6px 0 12px}
+.chap-lbl{padding:10px 14px 4px;font-size:0.77em;font-weight:700;color:var(--txt3);letter-spacing:.6px;text-transform:uppercase}
+.item{display:flex;align-items:center;gap:8px;padding:7px 14px;cursor:pointer;border-left:3px solid transparent;transition:.1s}
+.item:hover{background:var(--sur2)}.item.on{background:var(--acc-l);border-left-color:var(--acc)}
+.item-num{font-size:0.77em;color:var(--txt3);min-width:22px}.item-body{flex:1;min-width:0}
+.item-title{font-size:0.92em;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
+.item.on .item-title{color:var(--acc);font-weight:500}
+.item-tags{display:flex;gap:3px;margin-top:2px;flex-wrap:wrap}
+.tg{font-size:0.77em;padding:1px 5px;border-radius:8px;line-height:1.4}
+.tg-r{background:var(--grn-l);color:var(--grn)}.tg-s{background:var(--orn-l);color:var(--orn)}.tg-k{background:var(--acc-l);color:var(--acc)}
+.chk{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--bor2);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.69em;color:#fff;transition:.15s}
+.chk.on{background:var(--grn);border-color:var(--grn)}
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 24px;background:var(--sur);border-bottom:1px solid var(--bor);flex-shrink:0;gap:12px}
+.tb-title{font-size:1em;font-weight:500;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.tb-btns{display:flex;gap:6px;flex-shrink:0}
+.btn{padding:5px 12px;border:1px solid var(--bor2);border-radius:6px;background:var(--sur);color:var(--txt2);font-size:0.85em;cursor:pointer;transition:.15s;white-space:nowrap}
+.btn:hover{border-color:var(--acc);color:var(--acc)}.btn.star-on{background:var(--orn-l);border-color:var(--orn);color:var(--orn)}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}.btn.pri:hover{opacity:.85}
+.font-ctrl{display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--sur2);border-radius:var(--r);border:1px solid var(--bor);flex-shrink:0}
+.font-ctrl label{font-size:11px;color:var(--txt2);white-space:nowrap}
+.font-ctrl input[type=range]{width:80px;height:4px;accent-color:var(--acc);cursor:pointer}
+.font-ctrl span{font-size:11px;color:var(--acc);font-weight:600;min-width:28px;text-align:center}
+.content-scroll{flex:1;overflow-y:auto}
+.c-hd{padding:22px 28px 0;border-bottom:1px solid var(--bor);background:var(--sur)}
+.c-h1{font-size:1.54em;font-weight:700;color:var(--txt);line-height:1.3;margin-bottom:4px}
+.c-meta{font-size:0.85em;color:var(--txt3)}
+.c-tabs{display:flex;margin-top:12px}
+.c-tab{padding:9px 16px;font-size:0.92em;color:var(--txt3);cursor:pointer;border-bottom:2px solid transparent;transition:.15s}
+.c-tab:hover{color:var(--txt)}.c-tab.on{color:var(--acc);border-bottom-color:var(--acc);font-weight:600}
+.nb{padding:24px 28px;max-width:860px}
+.ns-hd{font-size:0.77em;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;margin-top:24px;display:flex;align-items:center;gap:8px}
+.ns-hd:first-child{margin-top:0}
+.ns-hd::after{content:'';flex:1;height:1px;background:var(--bor)}
+.kps{display:flex;flex-direction:column;gap:8px}
+.kp{padding:11px 14px 11px 16px;background:var(--sur);border:1px solid var(--bor);border-radius:var(--r);border-left:3px solid var(--acc)}
+.kp.w{border-left-color:var(--orn);background:var(--orn-l)}.kp.d{border-left-color:var(--red);background:var(--red-l)}
+.kp-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:3px}
+.kp-lbl{font-size:0.77em;font-weight:700;color:var(--acc)}.kp.w .kp-lbl{color:var(--orn)}.kp.d .kp-lbl{color:var(--red)}
+.kp-pg{font-size:0.77em;color:var(--txt3);background:var(--sur2);border:1px solid var(--bor);border-radius:4px;padding:1px 6px;flex-shrink:0}
+.kp-txt{font-size:0.96em;color:var(--txt);line-height:1.7}
+.nt-wrap{overflow-x:auto;margin-top:4px;border-radius:var(--r);border:1px solid var(--bor)}
+table.nt{width:100%;border-collapse:collapse;font-size:0.92em}
+.nt th{background:var(--sur2);padding:8px 12px;text-align:left;font-weight:600;color:var(--txt2);font-size:0.85em;border-bottom:1px solid var(--bor)}
+.nt td{padding:8px 12px;color:var(--txt);border-bottom:1px solid var(--bor);vertical-align:top;line-height:1.5}
+.nt tr:last-child td{border-bottom:none}.nt tr.ev td{background:var(--sur2)}
+.ph{padding:60px 28px;text-align:center;color:var(--txt3)}.ph-ico{font-size:3.23em;margin-bottom:12px}
+.ph-t{font-size:1.15em;color:var(--txt2);margin-bottom:6px}
+.empty-note{padding:48px 28px;text-align:center;color:var(--txt3)}
+mark{background:#fde68a;color:#78350f;border-radius:2px;padding:0 2px}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bor2);border-radius:2px}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="sb">
+  <div class="sb-top">
+    <div class="sb-logo"><div class="sb-icon">法</div><div><div class="sb-name">法學緒論筆記</div><div class="sb-sub">22 堂課</div></div></div>
+    <div class="prog-wrap"><div class="prog-row"><span class="prog-lbl">學習進度</span><span class="prog-num" id="pnum">0 / 22</span></div><div class="prog-bar"><div class="prog-fill" id="pf" style="width:0%"></div></div></div>
+    <div class="search-wrap"><span class="search-ico">🔍</span><input id="si" placeholder="搜尋課程名稱、關鍵字…" oninput="fl()"></div>
+    <div class="ftabs"><button class="ftab on" onclick="sf('all',this)">全部</button><button class="ftab" onclick="sf('unread',this)">未讀</button><button class="ftab" onclick="sf('read',this)">已讀</button><button class="ftab" onclick="sf('star',this)">重點</button></div>
+  </div>
+  <div class="list" id="list"></div>
+</div>
+<div class="main">
+  <div class="topbar">
+    <div class="tb-title" id="tbt">法學緒論筆記</div>
+    <div class="font-ctrl"><label>字級</label><input type="range" id="fsr" min="12" max="36" value="13" oninput="setFs(this.value)"><span id="fsv">13px</span></div>
+    <div class="tb-btns"><button class="btn" id="sbtn" onclick="toggleStar()">☆ 標重點</button><button class="btn pri" id="rbtn" onclick="toggleRead()">標為已讀</button></div>
+  </div>
+  <div class="content-scroll" id="cs"><div class="ph"><div class="ph-ico">📖</div><div class="ph-t">從左側選擇一堂課開始複習</div><div style="font-size:0.92em">共 22 堂課，L1–L10 已有筆記</div></div></div>
+</div>
+</div>
+<script>
+var LECS = [
+{id:1,ch:"第一篇　法學緒論總論",title:"課程介紹 ＋ 法系概論（大陸法系 vs 英美法系）",tags:["重點"],
+sum:"大陸法系vs英美法系特色、二元/一元訴訟制度、陪審制vs國民法官制",
+kps:[
+{t:"n",l:"大陸法系（歐陸法系/羅馬法系）",pg:"23-25",x:"我國採大陸法系，主要特色：<br>① 成文法系：以立法機關制定的成文法律為主要法源<br>② 二元訴訟制度：有行政法院（處理行政事件）和普通法院（處理民刑事件）分立<br>③ 職業法官：法官由國家考試及格任命（非民選）<br>④ 學習法理：法官依法律（成文法）審判<br>歷史：清末法律改革大量學習各國法律，最主要以歐陸法系為主（德國、法國），之後透過日本繼受"},
+{t:"n",l:"英美法系（海洋法系/判例法系）",pg:"23-25",x:"① 不成文法系（但非完全沒有成文法！）：主要是判例法（Case Law）、普通法（Common Law）<br>② 一元訴訟制度（司法一元制）：民事刑事行政都在同一套法院體系<br>③ 陪審制度：由公民擔任陪審員<br>④ 法官有時民選或由律師遴選產生（英國高等法院法官需10年以上出庭律師資歷）<br>⚠️ 選擇題陷阱：「英美法系沒有成文法」→錯！只是以判例法為主，仍有成文憲法、成文聯邦行政程序法（美國1946年）"},
+{t:"n",l:"我國採大陸法系的歷史脈絡",pg:"24",x:"① 清末民初接受歐陸法制<br>② 主要繼受德國、法國，再透過日本影響<br>③ 目前是大陸法系 = 歐陸法系 = 羅馬法系（同義詞，選擇題替換出現）<br>④ 英美法系 = 海洋法系（因英美是靠海強國）"},
+{t:"n",l:"陪審制 vs 國民法官制",pg:"23",x:"陪審制：英美法系，由一般公民擔任陪審員，法官與陪審員職責分工<br>我國國民法官制（112年推行）：國民法官與職業法官<b>共同</b>評議決定，與英美陪審制有所不同<br>⚠️ 「我國採陪審制」→錯！我國採國民法官制，性質不同"}
+],tabs:[{title:"大陸法系 vs 英美法系比較",hd:["比較項目","大陸法系（我國）","英美法系"],
+rows:[["又稱","歐陸法系/羅馬法系","海洋法系/判例法系"],
+["法源","成文法為主","判例法（Common Law）為主"],
+["訴訟制度","二元（行政法院+普通法院）","一元（單軌制）"],
+["法官產生","職業法官（考試任命）","民選或律師遴選"],
+["陪審","無（有國民法官制）","有陪審制"],
+["代表國家","德國、法國、日本、我國","英國、美國、澳洲"]],trap:[]}],svgs:[]},
 
-2. 下一題題目
-(A) 選項一
-(B) 選項二
-(C) 選項三
-(D) 選項四
-正解：D</pre>
-            </div>
-            <button id="bulkImportBtn" type="button">&#25209;&#37327;&#36617;&#20837;</button>
-          </div>
-          <p id="questionEditorStatus" class="hint" aria-live="polite"></p>
-          <div class="question-manager">
-            <div class="shop-row">
-              <h3>&#30446;&#21069;&#38988;&#30446;</h3>
-              <span id="questionCount" class="hint">0</span>
-            </div>
-            <div id="questionList" class="question-list" aria-label="custom question list"></div>
-          </div>
-          <textarea id="questionInput" spellcheck="false" aria-label="custom question bank JSON"></textarea>
-          <div class="editor-actions">
-            <button id="loadQuestionsBtn" type="button">&#36617;&#20837;&#38988;&#24235;</button>
-            <button id="importBackupBtn" type="button">&#21295;&#20837;&#20633;&#20221;</button>
-            <button id="sampleBtn" type="button">&#31684;&#20363;&#26684;&#24335;</button>
-          </div>
-          <input id="backupFileInput" type="file" accept="application/json,.json" hidden />
-          <p class="hint">JSON array. Each item needs question, choices, answer, and optional topic. answer starts from 0.</p>
-        </section>
-      </aside>
-      <section class="arena" aria-label="battle area">
-        <header class="topbar">
-          <div>
-            <p class="eyebrow">Quiz RPG</p>
-            <h1>&#21047;&#38988;&#21191;&#32773;</h1>
-          </div>
-          <div class="top-actions">
-            <button id="connectDbBtn" type="button">&#36899;&#25509;&#36039;&#26009;&#24235;</button>
-            <button id="loadDbBtn" type="button">&#35712;&#21462;&#36039;&#26009;&#24235;</button>
-            <button id="manualSaveBtn" type="button">&#23384;&#27284;</button>
-            <button id="toggleExtraBtn" type="button">&#26356;&#22810;&#21151;&#33021;</button>
-            <span id="saveStatus" class="save-status" aria-live="polite"></span>
-            <button id="resetBtn" class="icon-button" type="button" title="Reset progress" aria-label="Reset progress">
-              R
-            </button>
-          </div>
-        </header>
+{id:2,ch:"第一篇　法學緒論總論",title:"法律體系（實體法 vs 程序法）＋ 兩者互相摻雜",tags:["重點"],
+sum:"實體法vs程序法定義、程序從新實體從舊、兩者互相摻雜現象",
+kps:[
+{t:"n",l:"實體法 vs 程序法",pg:"54",x:"<b>實體法</b>：規定權利義務的內容本身（what）<br>例：民法（規定財產權、人格權）、刑法（規定犯罪構成要件）、行政法（規定人民與國家的關係）<br><br><b>程序法</b>：規定如何實現實體法上的權利（how）<br>例：民事訴訟法、刑事訴訟法、行政訴訟法<br><br>原則：先程序後實體（程序不合，實體不究）<br>例：車禍受傷→實體法：民法191之2（侵權行為）；程序法：民事訴訟法（怎麼起訴）→不寫狀、不繳裁判費→法院不受理→實體法根本用不到"},
+{t:"n",l:"程序從新，實體從舊（★★★）",pg:"54",x:"法律修正時的適用原則：<br>① <b>程序法</b>修正→<b>從新</b>（不回頭，直接用新的程序法）<br>② <b>實體法</b>修正→<b>原則從新，例外從舊</b>（信賴保護原則：法律原來答應你的，若新法沒有禁止，例外用舊法）<br><br>中標法第18條：從新從優原則（人民申請許可案→原則用新法；例外舊法有利+新法未完全禁止→用舊法）<br>⚠️ 注意：是「從優」不是「從輕」！處罰人民才有輕重問題；申請許可是對人民有利"},
+{t:"w",l:"實體法中有程序規定，程序法中有實體規定",pg:"54",x:"我國立法者分不清楚，常互相摻雜：<br>民法803條（拾得遺失物）→規定了取得的程序→<b>實體法中有程序規定</b><br>刑事訴訟法178條（證人不到場罰3萬）→創設3萬元的賠付基礎→<b>程序法中有實體規定</b><br>→ 行政程序法：偏向程序法，但也有實體規定<br>→ 所以只能說「偏向」實體法或程序法，沒有斷然的答案"},
+{t:"n",l:"公法 vs 私法",pg:"",x:"公法：規範國家與人民（或國家與國家）之間關係的法律→憲法、行政法、刑法、訴訟法<br>私法：規範人民與人民之間關係的法律→民法、商事法<br>⚠️ 刑法雖規範人民的行為，但法律關係是國家vs人民（刑罰權屬於國家）→公法<br>涉外民事法律適用法：適用於涉及外國人的民事關係→私法性質"}
+],tabs:[],svgs:[]},
 
-        <div class="battlefield">
-          <article class="hero panel">
-            <div class="equipment-rig">
-              <div id="equipmentSlots" class="equipment-slots" aria-label="equipment slots"></div>
-              <div id="paperDoll" class="paper-doll" aria-hidden="true"></div>
-            </div>
-            <div>
-              <p class="label">&#21191;&#32773;</p>
-              <h2 id="heroName">&#20320;</h2>
-            </div>
-            <dl class="stats">
-              <div>
-                <dt>Lv</dt>
-                <dd id="level">1</dd>
-              </div>
-              <div>
-                <dt>EXP</dt>
-                <dd><span id="xp">0</span>/<span id="xpNeed">100</span></dd>
-              </div>
-              <div>
-                <dt>&#36899;&#25802;</dt>
-                <dd id="streak">0</dd>
-              </div>
-              <div>
-                <dt>&#25216;&#33021;</dt>
-                <dd>Lv <span id="skillLevel">1</span></dd>
-              </div>
-            </dl>
-            <div class="bar skill" aria-label="skill experience">
-              <span id="skillBar"></span>
-            </div>
-            <p class="hint skill-hint">&#25216;&#33021; EXP <span id="skillXp">0</span>/<span id="skillXpNeed">50</span></p>
-            <div class="bar" aria-label="experience">
-              <span id="xpBar"></span>
-            </div>
-          </article>
+{id:3,ch:"第一篇　法學緒論總論",title:"法律名稱 ＋ 法律漏洞（公開性漏洞）",tags:["重點"],
+sum:"中標法第2條法律名稱四種+例外海關進口稅則、公開性漏洞定義、中標法第18條從新從優",
+kps:[
+{t:"n",l:"法律名稱四種（中標法第2條）",pg:"",x:"立法院三讀通過的法律，名稱只能是：法、律、條例、通則<br>⚠️ 唯一例外：<b>海關進口稅則</b>→雖然是法律，但不採用這四種名稱<br>→行政法與法學緒論都會考「下列何者雖為法律，但不採用中標法第2條名稱」→答案：海關進口稅則"},
+{t:"n",l:"法律的形式意義 vs 實質意義",pg:"",x:"<b>形式意義的法律</b>：由立法院依法定程序通過、總統公布的法律（程序上的法律）<br><b>實質意義的法律</b>：凡抽象、一般性規範人民行為的規範（內容上的法律）<br>形式意義＋實質意義：一般法律（如民法）<br>只有實質意義：行政命令（非法律程序制定）<br>例：海關進口稅則→有形式意義（立法院通過）也有實質意義（規範進口稅率）"},
+{t:"n",l:"公開性漏洞（法律因規定而未規定）★★",pg:"155",x:"法律應該積極規範某事項，但立法者沒有規定到→公開性漏洞<br>例：羅馬法規定四足動物咬人，所有人要賠償→鴕鳥（兩足）咬人→法律漏洞（沒規定到兩足動物）<br>處理方法：<b>類推適用</b>（等則等之，平等原則）<br>⚠️ 只有<b>類推適用</b>，沒有「類推解釋」！類推解釋是錯誤用法，法律人不用這個詞<br>⚠️ 刑法禁止類推適用（罪刑法定主義）；民法允許（平等原則）"},
+{t:"n",l:"類推適用 vs 準用",pg:"155-157",x:"<b>類推適用</b>：法律無明文規定，自己推導出來的（法無明文）<br>例：鴕鳥咬人→類推四足動物規定<br><br><b>準用</b>：立法者在法條中明文寫出「準用某條」（法有明文）<br>例：行政程序法149條「行政契約，準用民法規定」<br>目的：避免立法重複（不用把民法全部再抄一遍）<br>⚠️ 準用≠補充法律漏洞（準用立法者早有預見，沒有漏洞）"},
+{t:"n",l:"隱藏性漏洞（法律雖有規定但不適合適用）",pg:"155",x:"法律雖有規定，但立法者的本意不是要規範這個情形→隱藏性漏洞<br>處理方法：目的性限縮（把法律縮小解釋，排除不該適用的情形）<br>與公開性漏洞對照：<br>公開性漏洞→沒有規定到→類推適用（擴張）<br>隱藏性漏洞→有規定但不適用→目的性限縮（縮小）"}
+],tabs:[{title:"類推適用 vs 準用",hd:["比較項目","類推適用","準用"],
+rows:[["法律依據","無明文規定（法律漏洞）","有明文規定（法條明文寫明）"],
+["是否有漏洞","有（公開性漏洞）","無（立法者早有預見）"],
+["法理基礎","平等原則（等則等之）","立法者的指示"],
+["刑法可否使用","不可（罪刑法定主義）","可以"],
+["例子","鴕鳥咬人→類推四足動物規定","行程法149條準用民法"]],trap:[]}],svgs:[]},
 
-          <article class="monster panel">
-            <div class="sprite monster-sprite" id="monsterSprite" aria-hidden="true">M1</div>
-            <div>
-              <p class="label">&#30446;&#21069;&#24618;&#29289;</p>
-              <h2 id="monsterName">&#21490;&#33802;&#22982;</h2>
-            </div>
-            <dl class="stats">
-              <div>
-                <dt>HP</dt>
-                <dd><span id="monsterHp">60</span>/<span id="monsterMaxHp">60</span></dd>
-              </div>
-              <div>
-                <dt>&#29518;&#21237;</dt>
-                <dd><span id="monsterXp">25</span> EXP</dd>
-              </div>
-            </dl>
-            <div class="bar health" aria-label="monster health">
-              <span id="hpBar"></span>
-            </div>
-          </article>
-        </div>
+{id:4,ch:"第一篇　法學緒論總論",title:"規範審查權 ＋ 大法官 vs 小法官",tags:["重點"],
+sum:"憲法78條違憲審查獨佔制、憲訴法55條小法官申請釋憲、釋字371號、違憲判決案例",
+kps:[
+{t:"n",l:"規範審查權起源",pg:"",x:"規範審查權（違憲審查）起源：美國馬伯利訴麥迪遜案（1803年）<br>確立：法院有權審查法律是否符合憲法，違憲者宣告無效<br>各國制度不同：美國（各法院）vs 德國（專設憲法法院）vs 我國（司法院大法官）"},
+{t:"n",l:"大法官（司法院大法官）★★★",pg:"",x:"依據：憲法第78條：司法院解釋憲法，並有統一解釋法律及命令之權<br>產生：符合資格→總統提名→立法院同意→任命（不是考試出來的）<br>職權：① 宣告法律違憲（法律抵觸憲法）② 宣告命令違憲（命令抵觸憲法）③ 統一解釋法律命令<br>→ 中華民國宣告法律/命令違憲：<b>只有大法官</b>（獨佔制）<br>例：大法官791號宣告通姦罪違憲→刑法239條刪除"},
+{t:"n",l:"小法官（各級法院法官）★★★",pg:"",x:"產生：司法考試及格任命（通過特考就是法官）<br>義務：憲法80條→法官<b>依據法律</b>審判→不可拒絕適用立法院通過的法律<br>→ 就算法律爛到底，小法官不能拒絕適用（依法審判是宿命）<br><br>但是：若覺得法律可能違憲，可申請釋憲（釋字371號→憲訴法55條）<br>程序：裁定停止訴訟程序→申請大法官解釋（請學長幫忙）"},
+{t:"n",l:"憲訴法第55條（★選擇考點）",pg:"",x:"各法院（各級，不限最高法院！）就審理案件，認所適用的<b>法律</b>（命令不可申請！）<br>→ 有牴觸憲法之疑義者→可聲請憲法法庭裁判<br><br>兩個考點：<br>① 各法院都可以，不限最高法院（地方法院法官也可以）<br>② 只有法律才能申請，命令不行<br><br>例：臺北地院丁法官認為通姦罪違憲→不能拒絕適用（憲法80條）→裁定停止訴訟→申請釋憲"},
+{t:"d",l:"大法官 vs 小法官對照表",pg:"",x:"宣告法律違憲：大法官✔；小法官✗（沒有資格）<br>宣告命令違憲：大法官✔；小法官✗<br>申請釋憲：大法官（本身有解釋權）；小法官✔（依憲訴法55條）<br>拒絕適用法律：大法官✔；小法官✗（依法審判是宿命）"}
+],tabs:[],svgs:[]},
 
-        <section class="manual panel" aria-label="adventure handbook">
-          <div class="section-head">
-            <h2>&#20882;&#38570;&#25163;&#20874;</h2>
-            <span id="manualRank">F</span>
-          </div>
-          <div id="manualTabs" class="manual-tabs"></div>
-          <div id="manualContent" class="manual-content"></div>
-        </section>
+{id:5,ch:"第一篇　法學緒論總論",title:"法律關係 ＋ 物（動產 vs 不動產）",tags:["重點"],
+sum:"法律關係=權利義務關係、民法66/67/758/761條、動產不動產區別實益",
+kps:[
+{t:"n",l:"法律關係 = 權利義務關係",pg:"",x:"法律關係就是權利義務關係，包含：主體（誰）、客體（什麼）、內容（做什麼）<br>客體分兩類：①物（動產/不動產） ②行為（作為/不作為）<br>債權≠物→既非動產亦非不動產（債權是虛擬的法律上地位，不是實體）"},
+{t:"n",l:"不動產（民法66條）",pg:"",x:"稱不動產者：<b>土地及其定著物</b><br>定著：永久固定在土地上（關鍵字：永久）<br>例：建築物是不動產；露營帳篷不是（臨時，會拆）<br><br>不動產的出產物，<b>尚未分離者</b>：仍是不動產的一部分（如樹上蘋果、田中麥穗）<br>已分離者：則為動產（摘下蘋果、割下麥穗）"},
+{t:"n",l:"動產（民法67條）",pg:"",x:"動產：66條不動產以外之物（凡可用人力讓它移動者）<br><br>常考動產：樣品屋（預售屋展示間，臨時搭建會拆掉）、臨時戲台、廟會搭建的戲棚<br>常考不動產：建築物、食品屋（成屋，有門牌，真的賣給你）<br>汽車飛機船舶 = 動產（雖需在監理站登記，那是行政法上要求，民法上仍是動產）<br>⚠️ 「汽車要登記所以是不動產」→錯！監理站登記是為了行政管理（送達罰單）"},
+{t:"n",l:"動產 vs 不動產區別實益（所有權移轉方式）",pg:"",x:"不動產（民法758條）：須經登記，始生效力<br>→ 房子答應賣你→沒去地政登記→所有權還不是你的！<br><br>動產（民法761條）：一經交付，即生效力<br>→ 7-11買雜誌→交給你的那一刻→所有權就是你的<br><br>⚠️ 選擇題：「張三答應把房子賣給李四，李四因此取得所有權」→錯！尚未登記，所有權未移轉"}
+],tabs:[{title:"常見動產/不動產判斷",hd:["物品","性質","理由"],
+rows:[["建築物（一般）","不動產","永久固定於土地"],
+["樣品屋","動產","臨時搭建，會拆除"],
+["食品屋（成屋裝潢展示）","不動產","有門牌，真實出售"],
+["露營帳篷","動產","無永久固定意圖"],
+["廟會臨時戲台","動產","演完會拆，非永久"],
+["田中未割麥穗","不動產（土地部分）","尚未與土地分離"],
+["已割麥穗","動產","已與土地分離"],
+["汽車/飛機/船舶","動產","可移動（監理登記是行政管理）"],
+["高鐵/煤礦軌道","不動產","長期使用，永久固定意圖（釋字93號）"],
+["救災臨時軌道","動產","臨時鋪設，用完即拆"]],trap:[]}],svgs:[]},
 
-        <section class="question panel" aria-label="quiz question">
-          <div class="question-meta">
-            <span id="topicTag">&#22522;&#30990;&#38988;</span>
-            <span>&#31532; <b id="questionNo">1</b> &#38988;</span>
-            <span id="mvpTimer" class="mvp-timer" hidden>MVP 40s</span>
-          </div>
-          <h2 id="questionText">Loading...</h2>
-          <div id="choices" class="choices"></div>
-          <p id="feedback" class="feedback" aria-live="polite"></p>
-          <div id="explanationPanel" class="explanation-panel" hidden></div>
-        </section>
+{id:6,ch:"第一篇　法學緒論總論",title:"法律漏洞（類推適用）＋ 準用 ＋ 解釋方法",tags:["重點"],
+sum:"公開性/隱藏性漏洞、類推適用=平等原則=法理、準用=法定類推適用、解釋方法種類",
+kps:[
+{t:"n",l:"公開性漏洞 → 類推適用",pg:"155-157",x:"公開性漏洞：法律應積極規範而未規範（因規定而未規定）<br>解決：類推適用（Analogie）<br>法理：平等原則（等則等之，相似事物相似處理）<br><br>類推適用古代中文名稱：<b>庇護原理</b>（法治史老師常考）<br>類推適用 = 平等原則 = 法理（三者同義）<br><br>法定名稱：<b>準用</b>（立法者明文寫出的類推適用）<br>例：行程法149條→行政契約準用民法規定"},
+{t:"n",l:"解釋方法（五種）★★★",pg:"",x:"① <b>文義解釋</b>：依照文字字面解釋（最基本，也最常考）<br>② <b>體系解釋</b>：結合整部法律或法律體系脈絡解釋<br>③ <b>目的解釋</b>（目的論解釋）：依照立法目的解釋，看立法者的本意<br>④ <b>歷史解釋</b>：依照立法歷史（立法紀錄、草案說明）解釋<br>⑤ <b>比較法解釋</b>：參照外國法律解釋<br><br>⚠️ 解釋 vs 補充：如果可以解釋就不必補充；若需要補充，表示解釋已到極限（類推適用是補充，不是解釋）"},
+{t:"n",l:"縮小解釋 vs 目的性限縮",pg:"",x:"縮小解釋：法律文字範圍太廣，依文義縮小（仍是解釋）<br>目的性限縮：法律有規定，但立法目的不包含該情形，應縮小排除（補充手段，隱藏性漏洞）<br><br>擴張解釋：法律文字範圍太窄，依文義擴張（仍是解釋）<br>類推適用：法律完全沒有規定，類推有規定的情形（補充手段，公開性漏洞）"}
+],tabs:[],svgs:[]},
 
-        <section class="gacha-area">
-          <section class="panel wish-panel">
-            <div class="shop-row">
-              <h2>&#25277;&#21345;&#27231;</h2>
-              <button id="wishPullBtn" type="button">&#25277;&#19968;&#27425; 160</button>
-            </div>
-            <p id="wishInfo" class="hint"></p>
-            <div id="wishRewards" class="gacha-pool" aria-label="wish rewards"></div>
-          </section>
+{id:7,ch:"第一篇　法學緒論總論",title:"法律事實 ＋ 法律行為 ＋ 準法律行為",tags:["重點"],
+sum:"自然事實vs人之行為、事實行為vs表示行為（法律意識有無）、準法律行為三種（意思通知/觀念通知/情感表示）",
+kps:[
+{t:"n",l:"法律事實的定義",pg:"184",x:"法律事實：值得法律介入評價的社會生活事實（=法律關係的發生原因）<br>不是所有社會事實都是法律事實：上課打瞌睡不是；上課打人就是<br>分兩大類：① 自然事實（長輩死亡→繼承；小孩出生→親子關係）② 人之行為"},
+{t:"n",l:"人之行為分類",pg:"184-186",x:"違法行為→第九章制裁<br>適法行為分：<br><b>事實行為</b>：無法律意識（不需要有想要發生法律效果的意思），只要有物理上動作，法律就賦予效果<br>例：民法802條無主物先佔→撿到無主物→所有權自動移轉（不需要「我要取得所有權」的意思）<br><br><b>表示行為</b>：有法律意識→又分法律行為（強）和準法律行為（弱）"},
+{t:"n",l:"準法律行為三種（★選擇）",pg:"185",x:"法律意識較弱（間接），不直接照你的意思，但法律賦予一定效果：<br>① <b>意思通知</b>（催告）：向對方表示意思，法律不問你是否意欲其效果，均生效力<br>例：催告還錢（民法229條2項）→不管你是否知道法律效果，一律發生效力<br>② <b>觀念通知</b>：通知一個事實（非意思表示）→如拾得遺失物通知、行政的吹告函<br>③ <b>情感表示</b>：表達情感，但附帶產生法律效果<br>例：民法1053條→原諒通姦配偶的表示→不得再請求裁判離婚"},
+{t:"n",l:"法律行為：依意思表示個數分類",pg:"186",x:"① <b>單獨行為</b>：一個意思表示即可成立→遺囑、撤銷、解除契約<br>② <b>契約</b>：一方邀約＋他方承諾，兩者意思一致→買賣、租賃、僱傭<br>③ <b>共同行為</b>（合同行為）：多數意思表示平行一致→公司設立（股東決議）"}
+],tabs:[{title:"法律事實體系圖",hd:["類別","細分","法律意識","例子"],
+rows:[["自然事實","—","無","死亡→繼承；出生→親子關係"],
+["人之行為→適法→事實行為","—","無（只需物理動作）","撿到無主物（802條）；創作（著作權）"],
+["人之行為→適法→表示行為→準法律行為","意思通知","弱","催告還錢→時效中斷"],
+["","觀念通知","弱","通知拾得遺失物"],
+["","情感表示","弱","原諒通姦→不得再請求裁判離婚"],
+["人之行為→適法→表示行為→法律行為","單獨/契約/共同","強（直接照意思）","遺囑/買賣契約/公司設立"]],trap:[]}],svgs:[]},
 
-          <section class="panel gacha-panel">
-            <div class="shop-row">
-              <h2>&#25197;&#34507;&#27231;</h2>
-              <button id="gachaPullBtn" type="button">&#21934;&#25277; 80</button>
-            </div>
-            <p id="gachaMonth" class="hint"></p>
-            <div id="gachaPool" class="gacha-pool" aria-label="monthly gacha pool"></div>
-          </section>
+{id:8,ch:"第一篇　法學緒論總論",title:"行政制裁 ＋ 即時強制 ＋ 損失補償 vs 損害賠償",tags:["重點"],
+sum:"行政罰/懲戒罰/執行罰、行政執行法36條即時強制、損失補償vs損害賠償（41條）",
+kps:[
+{t:"n",l:"行政制裁三種類型",pg:"228-230",x:"① <b>行政罰</b>（行政秩序罰）：針對<b>過去</b>違反行政法義務的制裁（罰鍰、停業、吊照）<br>② <b>懲戒罰</b>：針對有特定身份（公務員、律師）的額外制裁（記過、免職），一般人不適用<br>③ <b>執行罰</b>（怠金）：針對<b>未來</b>，督促義務人履行義務（罰到來為止）<br>例：公務員嫖妓→①行政罰（罰鍰）②懲戒罰（記過）都要"},
+{t:"n",l:"行政執行三種方式",pg:"229",x:"① 公法上金錢給付義務的執行：欠稅、欠罰款<br>② 行為或不行為義務的執行：命拆違建（行為）；命停止噪音（不行為）<br>③ <b>即時強制</b>（行執法36條）：阻止犯罪危害發生，電光火石間的霹靂手段<br><br>即時強制例子：<br>→消防隊拆除隔壁棟防延燒→即時強制<br>→警察敲破車窗救嬰兒→即時強制"},
+{t:"n",l:"損失補償 vs 損害賠償（★★★★★絕對必考）",pg:"229-230",x:"<b>損失補償</b>：國家<b>合法</b>行為造成人民損失（行執法41條）<br>例：消防隊為防延燒，合法拆除鄰居房子→鄰居可申請<b>損失補償</b>（非國家賠償）<br><br><b>損害賠償</b>（國家賠償）：國家<b>違法</b>行為造成人民損害<br>例：警察違法逮捕人→可請求<b>國家賠償</b><br><br>⚠️ 一定要分清楚：合法→補償；違法→賠償（一個字不能寫錯）"}
+],tabs:[{title:"損失補償 vs 損害賠償",hd:["項目","損失補償","損害賠償（國賠）"],
+rows:[["前提","國家合法行為","國家違法行為"],
+["法律依據","行政執行法41條（即時強制）、各特別規定","國家賠償法"],
+["例子","消防隊合法拆隔壁防延燒","警察違法逮捕"],
+["記憶口訣","合法→補償","違法→賠償"]],trap:[]}],svgs:[]},
 
-          <section class="panel card-gacha-panel">
-            <div class="shop-row">
-              <h2>&#25197;&#34507;&#27231;2</h2>
-              <button id="cardGachaPullBtn" type="button">&#25277;&#21345; 80</button>
-            </div>
-            <p id="cardGachaInfo" class="hint"></p>
-            <div id="cardGachaPool" class="gacha-pool" aria-label="card gacha pool"></div>
-          </section>
-        </section>
-      </section>
+{id:9,ch:"第一篇　法學緒論總論",title:"勞動法（派遣勞工）＋ 性別平等工作法",tags:["重點"],
+sum:"派遣勞動三方關係、育嬰留職停薪書面申請、性騷擾離職後仍可申訴、家庭暴力防治法",
+kps:[
+{t:"n",l:"派遣勞動關係（三方）",pg:"",x:"三方關係：<br>① <b>派遣僱主</b>（派遣公司）與<b>派遣勞工</b>：真正的勞動契約（法律上的僱傭關係）<br>② <b>要派人</b>（實際使用勞工的公司）與<b>派遣僱主</b>：要派契約/商務契約<br>③ <b>要派人</b>與<b>派遣勞工</b>：指揮監督關係（無勞動契約！）<br><br>⚠️ 派遣勞工真正上班地方=要派人；真正老闆（勞動契約）=派遣僱主"},
+{t:"n",l:"性別平等工作法重要規定",pg:"",x:"育嬰留職停薪：<br>① 夫妻均可申請（男生也可以）<br>② 申請<b>應以書面為之</b>（不可口頭，選擇題考過）<br>③ 期滿後：僱主應以<b>回復原有工作</b>為原則（不得降低勞動條件）<br>④ 育嬰期間僱主可僱用替代人力（代替者，非正式員工）<br><br>性騷擾申訴：<br>→ 已離職的員工，若在職期間受到性騷擾，仍可申訴！<br>→ 臺北高行101年度判決：僱主知悉後有依法處理的公法義務，應作為而不作為→可被裁罰"},
+{t:"n",l:"家庭暴力防治法",pg:"",x:"家庭暴力：指家庭成員間實施身體、精神或經濟上的騷擾、控制、脅迫或其他不法侵害行為<br>⚠️ 包含<b>經濟控制</b>（如每月只給2000元生活費）→也是家暴<br><br>保護令：通常→法院許可；緊急→以電話等方式即可<br>延長：2年，每次延長也是2年<br>申訴機制：地方主管機關→對處分不服→10天內向中央申請審議 或 直接提起訴願"}
+],tabs:[],svgs:[]},
 
-      <aside class="side">
-        <section class="panel daily-panel">
-          <div class="shop-row">
-            <h2>&#27599;&#26085;&#20219;&#21209;</h2>
-            <button id="dailyNpcBtn" type="button">NPC +20</button>
-          </div>
-          <p id="dailyDate" class="hint"></p>
-          <div id="dailyMissions" class="daily-missions" aria-label="daily missions"></div>
-        </section>
+{id:10,ch:"第一篇　法學緒論總論",title:"不確定法律概念 ＋ 行政裁量",tags:["重點"],
+sum:"完全性/不完全性法條、不確定法律概念（構成要件）vs行政裁量（法律效果）、判斷餘地vs裁量餘地",
+kps:[
+{t:"n",l:"完全性法條 vs 不完全性法條",pg:"56",x:"<b>完全性法條</b>（完整性法條）：同一條文同時有構成要件＋法律效果<br>例：刑法271條「殺人者（構成要件）處死刑、無期徒刑、十年以上有期徒刑（法律效果）」<br><br><b>不完全性法條</b>：只有構成要件或只有法律效果<br>例：民法982條（結婚要件）=只有構成要件；民法988條（婚姻無效）=只有法律效果"},
+{t:"n",l:"不確定法律概念（★★★）",pg:"56-57",x:"位置：出現在<b>構成要件</b>（前提條件）<br>原因：條文有限，現象無窮→立法者用模糊概念涵蓋更多情形<br>例：「放蕩之行為」「重大過失」「公共利益」→不確定法律概念<br><br>司法審查：<b>原則可以審查</b>（司法權對法律最專業）<br>例外：<b>判斷餘地</b>（保護罩）→出現時，司法不介入（行政比司法專業）<br>判斷餘地出現時機：① 國家考試評分 ② 高度專業委員會決定 ③ 預測性決定"},
+{t:"n",l:"行政裁量（★★★）",pg:"57",x:"位置：出現在<b>法律效果</b>（後果）<br>目的：實現個案正義，給行政機關彈性（如：闖紅燈可罰1800~5400，態度好罰少，態度差罰多）<br>司法審查：<b>原則不介入</b>（權力分立，尊重行政裁量）<br>例外：<b>裁量瑕疵</b>→司法介入（裁量逾越、裁量濫用、裁量怠惰）<br>依據：行政程序法第10條（合義務性裁量原則）"},
+{t:"d",l:"不確定法律概念 vs 行政裁量（★最常混淆）",pg:"56-57",x:"不確定法律概念：在<b>構成要件</b>→判斷餘地→原則可審查<br>行政裁量：在<b>法律效果</b>→裁量餘地→原則不審查<br><br>記憶口訣：<b>前段（構成）=不確定法律概念；後段（效果）=行政裁量</b><br>⚠️ 題目考「司法可否審查」：不確定法律概念→可審查（除判斷餘地）；行政裁量→不審查（除裁量瑕疵）"}
+],tabs:[{title:"不確定法律概念 vs 行政裁量",hd:["比較項目","不確定法律概念","行政裁量"],
+rows:[["出現位置","構成要件（前提）","法律效果（後果）"],
+["例子","「放蕩行為」「重大過失」","罰1800~5400元"],
+["保護罩名稱","判斷餘地","裁量餘地（合義務性裁量）"],
+["司法介入原則","原則可以審查","原則不介入"],
+["司法介入例外","判斷瑕疵（裂開保護罩）","裁量瑕疵（逾越/濫用/怠惰）"],
+["依據","憲法（法治國原則）","行政程序法第10條"]],trap:[]}],svgs:[]}
+];
 
-        <section class="dungeons panel" aria-label="dungeons">
-          <div class="section-head">
-            <h2>&#21103;&#26412;</h2>
-            <span id="currentDungeonLabel">&#34892;&#25919;&#27861;</span>
-          </div>
-          <div id="dungeonList" class="dungeon-list"></div>
-        </section>
+// L11-22 placeholders
+var L11to22 = [
+{id:11,ch:"第一篇　法學緒論總論",title:"著作權法（一）：著作財產權各種類型",tags:["重點"],
+sum:"著作財產權種類（重製/公開口述/播送/上映/演出/傳輸/改作/散布）、媒介型態區別",
+kps:[
+{t:"n",l:"著作權法基本架構",pg:"",x:"主管機關：經濟部（著作權法第2條），下設智慧財產局<br>著作權分兩大類：① 著作人格權（人格尊嚴）② 著作財產權（經濟價值）<br>公眾：不特定人或特定多數人；但書：家庭及正常社交多數人不算（唱歌給家人聽不侵權）"},
+{t:"n",l:"著作財產權各種類型（★媒介型態要分清楚）",pg:"",x:"① <b>重製權</b>：以印刷影印錄音錄影等重新製作（影印原文書給同學→違法重製）<br>② <b>公開口述</b>：透過<b>言詞</b>（講三國演義給路人聽）<br>③ <b>公開播送</b>：透過<b>有線電/無線電廣播系統</b>（第四臺播電影）<br>④ <b>公開上映</b>：透過<b>視聽機器</b>（星光電影院放電影）<br>⑤ <b>公開演出</b>：透過<b>演技舞蹈歌唱彈奏樂器</b>（演出別人的舞台劇）<br>⑥ <b>公開傳輸</b>：透過<b>網路</b>（把書掃描PO在網路上）<br>⑦ <b>改作權</b>：翻譯編曲改寫（翻譯哈利波特→有新的改作權）<br>⑧ <b>散布權</b>：將著作原件或重製物散布，需有<b>實體</b>（把筆記抄本在夜市販賣）"},
+{t:"w",l:"改作的雙重著作權（★）",pg:"",x:"例：翻譯哈利波特→①JK羅琳有原著作財產權　②翻譯者有改作權（新的著作財產權）<br>→ 若要把翻譯版拍成電影，必須同時取得JK羅琳和翻譯者兩人的授權！"},
+{t:"n",l:"公開展示權（著作權法27條）★",pg:"",x:"只有<b>未發行</b>的<b>美術著作或攝影著作</b>才有公開展示權<br>⚠️ 已發行→大家都看過，無展示權問題<br>⚠️ 語文著作（文章）→沒有公開展示權<br>⚠️ 把別人文章PO在網站→侵犯的是<b>公開傳輸權</b>（不是公開展示權）"},
+{t:"n",l:"不受著作權保護的標的（著作權法第9條）",pg:"",x:"① 憲法法律命令（任何人都要看）<br>② 政府機關解釋上述法律的文件（大法官解釋彙編沒有著作權）<br>③ 標語及通用之符號名詞<br>④ 單純為傳達事實的新聞報導（純事實記述）<br>⑤ 依法令舉行的各類考試試題（公務員考試題目沒有著作權）<br>⚠️ 「新聞報導沒有著作權」→只有純傳達事實者，有特別敘述風格的仍受保護"}
+],tabs:[{title:"著作財產權種類與媒介型態",hd:["種類","媒介型態","例子"],
+rows:[["公開口述","言詞","在廣場朗讀別人的詩集"],["公開播送","有線電/無線電廣播系統","第四臺播周星馳電影"],["公開上映","視聽機器","廟口搭布幕放電影"],["公開演出","演技舞蹈歌唱彈奏","演出別人的舞台劇"],["公開傳輸","網路","把書掃描PO網路上"],["散布","實體物件","影印課本在夜市賣"]],trap:[]}],svgs:[]},
 
-        <section class="panel">
-          <h2>&#25136;&#32318;</h2>
-          <dl class="record">
-            <div>
-              <dt>&#31572;&#23565;</dt>
-              <dd id="correctCount">0</dd>
-            </div>
-            <div>
-              <dt>&#31572;&#37679;</dt>
-              <dd id="wrongCount">0</dd>
-            </div>
-            <div>
-              <dt>&#25802;&#25943;</dt>
-              <dd id="defeatedCount">0</dd>
-            </div>
-            <div>
-              <dt>&#27491;&#30906;&#29575;</dt>
-              <dd id="accuracy">0%</dd>
-            </div>
-          </dl>
-        </section>
+{id:12,ch:"第一篇　法學緒論總論",title:"著作權法（二）：著作人格權 ＋ 創作保護主義",tags:["重點"],
+sum:"創作即保護無需登記、著作人格權三種（15/16/17條）、著作人格權不得讓與繼承",
+kps:[
+{t:"n",l:"創作保護主義（★選擇考點）",pg:"",x:"我國著作權採<b>創作保護主義</b>：著作<b>完成時即受保護</b>，不需登記、不需任何形式要件<br>⚠️ 「著作需登記才受著作權保護」→錯！<br>⚠️ 「著作完成即受保護，無需登記」→正確"},
+{t:"n",l:"著作人格權三種（★背）",pg:"",x:"① <b>公開發表權</b>（著作權法15條）：決定是否公開著作的權利<br>→ 未經著作人同意就公開他的著作→侵犯公開發表權<br>② <b>姓名表示權</b>（16條）：決定著作上是否標示姓名及如何標示<br>→ 把別人著作當自己的，或刪去著作人姓名→侵犯姓名表示權<br>③ <b>禁止變更權</b>（17條，又稱同一性保持權）：禁止他人醜化歪曲或損害著作人名譽的方式改變著作<br>→ 如果變更不損害名譽（如無害的解釋性改動）→不侵犯17條"},
+{t:"n",l:"著作人格權不得讓與或繼承（著作權法21條）",pg:"",x:"著作人格權：<b>一身專屬，不得讓與，亦不得繼承</b>（著作人死亡後消滅，不得繼承）<br>著作財產權：可以讓與、繼承、授權他人使用<br>⚠️ 選擇題：「下列何者不能讓你繼承」→著作人格權"},
+{t:"n",l:"著作財產權保護期間",pg:"",x:"一般：著作人生存期間加死後50年<br>法人著作：公開發表後50年<br>⚠️ 期滿後→著作進入公共領域，任何人可自由使用"}
+],tabs:[{title:"著作人格權 vs 著作財產權",hd:["比較","著作人格權","著作財產權"],
+rows:[["條文","15/16/17條","22~29條"],["內容","公開發表/姓名表示/禁止變更","重製/播送/改作/散布等"],["可否讓與","不可（一身專屬）","可以"],["可否繼承","不可","可以"],["期間","著作人生存期間","生存加死後50年"]],trap:[]}],svgs:[]},
 
-        <section class="panel rewards">
-          <h2>&#29518;&#21237;</h2>
-          <dl class="wallet">
-            <div>
-              <dt>&#37329;&#24163;</dt>
-              <dd id="coins">0</dd>
-            </div>
-            <div>
-              <dt>&#23542;&#30707;</dt>
-              <dd id="gems">0</dd>
-            </div>
-            <div>
-              <dt>&#31934;&#38728;&#23542;&#37978;</dt>
-              <dd id="elfDiamonds">0</dd>
-            </div>
-          </dl>
-          <div class="inventory" aria-label="inventory">
-            <div><span>HP</span><b id="potionCount">0</b></div>
-            <div><span>XP</span><b id="scrollCount">0</b></div>
-            <div><span>KEY</span><b id="keyCount">0</b></div>
-          </div>
-          <ul id="rewardLog" class="reward-log" aria-live="polite"></ul>
-        </section>
+{id:13,ch:"第二篇　法學緒論各論",title:"民法債編（債權讓與 ＋ 債務承擔）＋ 全民健保",tags:["重點"],
+sum:"民法294條債權讓與不需債務人同意、297條通知對債務人發生效力、全民健保爭議審議",
+kps:[
+{t:"n",l:"債權讓與（民法294條）★★",pg:"",x:"債權人可以將債權讓給第三人，<b>原則上自由讓與，不需要債務人的同意</b><br>理由：債權人的變更對債務人並無不利（還是還一樣的錢）<br>例外不得讓與：①依債權性質不得讓與（如扶養請求權）②特約不得讓與③債權禁止扣押者<br><br>附隨移轉（民法295條）：讓與債權時，該債權的擔保及從屬權利<b>隨同移轉</b>給受讓人（保證/抵押權都跟著跑）"},
+{t:"n",l:"債權讓與對債務人的效力（民法297條）★",pg:"",x:"債權讓與<b>非經讓與人或受讓人通知債務人，對債務人不生效力</b><br>→ 讓與人（原債權人）或受讓人（新債權人）通知債務人，<b>兩者都可以</b><br>→ 只需要<b>通知</b>，不需要得到債務人的同意<br>⚠️ 民法296條（交付債權文件）只是讓與後的附隨義務，不是294條的生效要件"},
+{t:"n",l:"債務承擔（民法300/301條）",pg:"",x:"債務人變更（換人來還債）<br>① 第三人承擔全部債務：需<b>得到債權人的同意</b>（對債權人有利益影響）<br>② 由新債務人承擔債務：需得到債權人同意，否則對債權人不生效力<br>⚠️ 債務承擔需得到債權人同意（vs 債權讓與不需要債務人同意）"},
+{t:"n",l:"全民健保爭議審議",pg:"",x:"全民健保發生爭議：先向<b>全民健康保險爭議審議會</b>申請審議（訴願先行程序）<br>→ 不服審議決定→再提訴願或行政訴訟<br>眷屬保費：超過三口不收（第18條）<br>政府負擔：每年不得少於36%（第3條）<br>主管機關：衛福部"}
+],tabs:[{title:"債權讓與 vs 債務承擔",hd:["比較","債權讓與（294條）","債務承擔（300條）"],
+rows:[["變更的是","債權人","債務人"],["是否需對方同意","不需要債務人同意","需要債權人同意"],["通知效力","須通知債務人才對債務人生效","須得到債權人同意"],["理由","債權人換人不影響債務人","債務人換人影響債權人能否受清償"]],trap:[]}],svgs:[]},
 
-        <section class="panel study-panel">
-          <div class="shop-row">
-            <h2>&#23416;&#32722;&#35336;&#26178;</h2>
-            <button id="studyToggleBtn" type="button">&#38283;&#22987;</button>
-          </div>
-          <dl class="study-stats">
-            <div>
-              <dt>&#32047;&#31309;</dt>
-              <dd id="studyTime">00:00</dd>
-            </div>
-          </dl>
-        </section>
+{id:14,ch:"第二篇　法學緒論各論",title:"勞動法（勞動三權 ＋ 要式行為）＋ 職業災害",tags:["重點"],
+sum:"勞動三權（團結權/協商權/爭議權）、民法73條要式行為書面、人事保證756-1、職業災害補償",
+kps:[
+{t:"n",l:"勞動三權（學說見解）★★",pg:"",x:"① <b>團結權</b>：勞工組織或加入工會的權利（針對個別勞工弱勢地位）<br>② <b>協商權</b>（交涉權/協議權）：集合勞動者力量，集體向資方爭取改善勞動條件，結果為<b>團體協約</b><br>③ <b>爭議權</b>：勞方的罷工權；資方的閉廠封鎖權<br><br>三權相互依存缺一不可：無團結權→無法行使協商權；無協商權→爭議權幾乎無用武之地<br><br>⚠️ 公務員<b>沒有勞動三權</b>（公服法第1條：公務員對國家負有忠實義務，不得罷工）"},
+{t:"n",l:"要式行為 vs 不要式行為（★★）",pg:"",x:"<b>要式行為</b>：法律規定必須依法定方式才能生效<br>最常見的：<b>書面</b>（應以書面為之）<br>民法73條：法律行為不依法定方式者<b>無效</b><br>例：人事保證契約（756-1條）→應以書面為之→未簽書面→無效<br><br>但書：法律另有規定者不同（民法73條但書）<br>例：不動產租賃超過一年（422條）→未以書面→視為<b>不定期限租賃</b>（非無效）<br><br>⚠️ 有些要式行為未踐行不是「無效」而是其他效果，需看法條具體規定"},
+{t:"n",l:"職業災害補償（勞基法59~63條）★",pg:"",x:"僱主義務：勞工因職業災害傷害疾病，僱主必須給予補償<br>請求時效：<b>2年</b>（61條）<br>補償期間：僱主不得解雇（職業災害補償期間受到保護）<br>轉包連帶責任（62條）：有次承攬再承攬→所有承攬人連帶負責<br>派遣勞工職業災害（63-1條）：要派單位與派遣事業單位<b>連帶</b>負責"}
+],tabs:[],svgs:[]},
 
-        <section class="panel equipment-panel">
-          <h2>&#32972;&#21253;</h2>
-          <div class="shop-row">
-            <h3>&#24618;&#29289;&#25481;&#33853;</h3>
-            <button id="sellAllBtn" type="button">&#20840;&#37096;&#36067;&#20986;</button>
-          </div>
-          <div class="bag-tools" aria-label="bag filters">
-            <input id="bagSearchInput" type="search" placeholder="搜尋背包" />
-            <select id="bagCategoryInput">
-              <option value="all">全部</option>
-              <option value="equipment">裝備</option>
-              <option value="card">卡片</option>
-              <option value="headgear">頭飾</option>
-              <option value="material">材料</option>
-              <option value="refine">精煉</option>
-              <option value="mvp">MVP材料</option>
-            </select>
-          </div>
-          <div id="dropInventory" class="drop-inventory" aria-label="drop inventory"></div>
-          <div class="bag-divider"></div>
-          <h3 class="bag-heading">&#35037;&#20633;&#24037;&#22346;</h3>
-          <div id="weaponForge" class="weapon-forge" aria-label="equipment forge"></div>
-          <div class="bag-divider"></div>
-          <div class="blacksmith-npc">
-            <div class="blacksmith-avatar" aria-hidden="true">鐵</div>
-            <div>
-              <h3 class="bag-heading">鐵匠NPC</h3>
-              <p class="hint">裝備、精煉、修復都交給鐵匠處理。</p>
-            </div>
-          </div>
-          <div id="equipmentBag" class="equipment-bag blacksmith-list" aria-label="blacksmith refinement list"></div>
-        </section>
-      </aside>
-    </main>
+{id:15,ch:"第二篇　法學緒論各論",title:"民法親屬（姻親 ＋ 離婚三種方式）＋ 勞工保險",tags:["重點"],
+sum:"姻親消滅971條、三種離婚方式（1050協議/1052裁判/1052之一調解和解）、勞保通知申報原則",
+kps:[
+{t:"n",l:"姻親關係的消滅（民法971條）",pg:"",x:"姻親關係消滅的原因：<br>① <b>離婚</b>（1050/1052/1052之一）<br>② 婚姻被<b>撤銷</b>（997條：被詐欺或脅迫結婚→可撤銷）<br>③ <b>配偶死亡後</b>→依法務部函釋（司法行政部50年函），姻親關係不當然消滅（夫死妻不再婚，仍保留姻親關係為固有國情）"},
+{t:"n",l:"三種離婚方式（★★★背）",pg:"",x:"① <b>兩願離婚（協議離婚）民法1050條</b>：需①書面②兩人以上證人簽名③向戶政登記<br>→ 登記是<b>生效要件</b>：簽了協議書未登記→還未離婚<br><br>② <b>裁判離婚民法1052條</b>：一方有法定事由，另一方向法院起訴，法官判決<br>→ 判決確定即離婚（形成判決）：戶政登記只是行政手續<br>→ 判決確定後跟別人發生性行為→不侵犯對方配偶權（已非配偶）<br><br>③ <b>調解和解離婚民法1052之一條</b>：法院調解或和解成立→婚姻關係消滅<br>→ 和解成立即離婚（同裁判離婚，戶政登記只是行政手續）"},
+{t:"n",l:"勞工保險條例重要考點",pg:"",x:"通知申報原則（11條）：投保單位應在員工到職<b>當日</b>通知；勞保效力從通知日起算<br>→ 公司若故意不通知→將受處罰；勞保效力不從員工到職日起算<br>服兵役可繼續參加勞保（9條第1款）：仍願意繼續交保費→年資不中斷<br>年資15年以上被裁撤→仍可繼續加保直到請領老年給付（9條，需15年以上）<br>眷屬超過三口不收保費（18條）"},
+{t:"w",l:"裁判離婚 vs 協議離婚生效時點（★常考）",pg:"",x:"協議離婚（1050）：到戶政登記時生效<br>裁判離婚（1052）：判決確定即生效（戶政登記只是行政手續）<br>調解和解（1052之一）：和解成立即生效（戶政登記只是行政手續）<br>⚠️ 「協議離婚簽書面就離婚了」→錯！還需要登記"}
+],tabs:[{title:"三種離婚方式比較",hd:["種類","法條","生效時點","特點"],
+rows:[["協議離婚","1050條","向戶政登記時","需書面+兩人以上證人+登記（三要件）"],["裁判離婚","1052條","判決確定即生效","形成判決，戶政登記只是行政手續"],["調解和解離婚","1052之一條","和解成立即生效","如同1052，非1050"]],trap:[]}],svgs:[]},
 
-    <script src="nippon-colors.js"></script>
-    <script src="app.js"></script>
-  </body>
+{id:16,ch:"第二篇　法學緒論各論",title:"民法繼承（法定繼承人順序 ＋ 應繼分）",tags:["重點"],
+sum:"民法1138條法定繼承人（配偶當然繼承+四順序）、1077條養子女與婚生子女同、1144條應繼分計算",
+kps:[
+{t:"n",l:"法定繼承人（民法1138條）★★★",pg:"",x:"繼承事實發生（人死亡）→遺產由法定繼承人繼承<br><b>配偶</b>：<b>當然繼承人</b>（一定分得到，不管其他人是否存在）<br><b>順序繼承人</b>（四順序，互相排斥，高順序存在→低順序分不到）：<br>① 直系血親卑親屬（子女、孫子女）<br>② 父母（收養關係中→指養父母）<br>③ 兄弟姐妹（含半血緣，需有共同父或共同母）<br>④ 祖父母（含外祖父母，最多四位）"},
+{t:"n",l:"養子女的繼承地位（民法1077條）★",pg:"",x:"養子女與養父母的關係：<b>與婚生子女同</b>（1077條第1項）<br>→ 應繼分與婚生子女完全相同（舊法較少，已修正）<br><b>1077條第2項</b>：養子女與<b>本身父母</b>的關係，在收養關係存續中<b>停止</b>（暫停非消滅）<br>→ 收養期間死亡→繼承的「父母」是養父母，非本身父母<br>→ 收養期間本身父母死亡→養子女不能繼承（本身父母非其法律上的父母）<br><br>⚠️ 女兒嫁出去仍與兒子有同樣的繼承份額（男女平等）"},
+{t:"n",l:"應繼分計算（民法1144條）★★",pg:"",x:"配偶與<b>第一順序</b>（直系血親卑親屬）：<b>平均分配</b><br>例：配偶+2個子女=3人平分，各1/3<br><br>配偶與<b>第二順序</b>（父母）或<b>第三順序</b>（兄弟姐妹）：<b>配偶先拿1/2，其餘由順序繼承人平分</b><br>例：配偶+父母2人→配偶1/2；父親1/4；母親1/4<br><br>配偶與<b>第四順序</b>（祖父母）：配偶先拿2/3，祖父母平分1/3"},
+{t:"n",l:"兄弟姐妹的繼承資格",pg:"",x:"兄弟姐妹：需有<b>共同父或共同母</b>（至少一個相同）<br>全血緣：父母都相同；半血緣：只有一個父或一個母相同<br>⚠️ 不包含：表兄弟姐妹、堂兄弟姐妹、結拜兄弟（無法律依據）"}
+],tabs:[],svgs:[]},
+
+{id:17,ch:"第二篇　法學緒論各論",title:"刑法（法定刑/宣告刑/執行刑）＋ 罪數並罰 ＋ 消費者保護法",tags:["重點"],
+sum:"刑法57條十大量刑原則、刑法50/51條罪數並罰（最長30年）、消保法企業經營者無過失責任",
+kps:[
+{t:"n",l:"法定刑 vs 宣告刑 vs 執行刑（★★★）",pg:"",x:"<b>法定刑</b>：立法者針對某犯罪類型預設的刑罰範圍（對事不對人）<br>例：殺人罪法定刑＝死刑、無期徒刑、10年以上有期徒刑<br><br><b>宣告刑</b>：審判者（法官）針對<b>特定行為人</b>，從法定刑範圍中選出的刑罰<br>依據：刑法第57條（十大量刑原則，含犯罪後態度）→每個共犯宣告刑通常不同<br><br><b>執行刑</b>：有多數宣告刑時，依刑法51條定出<b>真正應執行的刑期</b><br>最重要：第5款（宣告多數有期徒刑）→各刑最長期以上、各刑合計以下；最長不得超過<b>30年</b>"},
+{t:"n",l:"罪數並罰（刑法50、51條）★",pg:"",x:"刑法50條（實質競合犯）：裁判確定前犯數罪→<b>分別宣告</b>各罪刑，再定執行刑<br>刑法51條：定執行刑，有期徒刑最長<b>不得超過30年</b><br>理由：超過30年無法達到教化功用，且無法再適應社會<br><br>例：A罪3年+B罪7年+C罪10年+D罪15年→<br>最少執行：15年（最長期）；最多執行：30年（合計35年，縮短至30年）"},
+{t:"n",l:"消費者保護法重要概念",pg:"",x:"企業經營者對消費者：<b>無過失責任</b>（不需要證明有故意過失）<br>→ 買肯德基回家給太太吃中毒→太太因非契約當事人，用民法侵權行為很難（需證明過失）<br>→ 太太應用<b>消保法</b>（無過失責任）請求賠償<br><br><b>限物邀約</b>（消保法20條）：未經消費者同意直接寄商品→消費者不須付款，得要求退還<br><br>消費者：包含法人（法人也得為消費者）"}
+],tabs:[],svgs:[]},
+
+{id:18,ch:"第二篇　法學緒論各論",title:"刑法競合（想像競合 ＋ 牽連犯已刪 ＋ 連續犯已刪）",tags:["重點"],
+sum:"刑法55條想像競合犯（一行為觸犯數罪名從一重）、94年修法刪除牽連犯和連續犯",
+kps:[
+{t:"n",l:"想像競合犯（刑法55條）★★★",pg:"",x:"定義：<b>一行為觸犯數罪名</b>→從一重處斷<br>例：職業殺手一槍打穿落地窗殺人→一行為→毀損罪+殺人罪→想像競合犯→從一重（殺人罪）<br>例：硫酸潑向人群（一行為）→傷害十幾個人（數罪名）→想像競合犯<br>例：辦公室飲水機下毒（一行為）→毒死20人（數罪名）→想像競合犯<br><br>⚠️ 民國94年刑法修正時：想像競合犯<b>保留</b>（未刪除）"},
+{t:"n",l:"牽連犯（民國94年已刪除）",pg:"",x:"舊法（94年前）：方法行為犯一罪，結果行為另犯一罪，兩者有牽連關係→從一重處斷（不合理！多個行為卻只處罰一個）<br>例：偷刀（竊盜）→殺人→二行為二罪，舊法從一重（不合理）<br><br>94年刪除後：改依刑法50條<b>實質競合犯</b>處理→竊盜一個宣告刑+殺人一個宣告刑→合定執行刑（合理）<br>⚠️ 你的法典刑法55條現在只有想像競合犯，後段（牽連犯）已刪除"},
+{t:"n",l:"連續犯（民國94年已刪除）",pg:"",x:"舊法（94年前刑法56條）：連續數行為犯同一罪→算一個罪，加重其刑1/2（不合理！強暴1人和強暴18人刑罰差距太小）<br><br>94年刪除後：每次強暴都是獨立的罪→實質競合犯→各自有宣告刑→定執行刑（合理）<br>⚠️ 你的法典刑法56條只剩「刪除」兩字"}
+],tabs:[{title:"刑法競合三種類型",hd:["類型","行為數","罪名數","94年後處理方式","是否仍存在"],
+rows:[["想像競合犯（55條）","一行為","數罪名","從一重處斷","存在✔"],["牽連犯","數行為","數罪名（有牽連）","改為實質競合犯（50條）","已刪除✗"],["連續犯","數行為","同一罪名","改為實質競合犯（50條）","已刪除✗"]],trap:[]}],svgs:[]},
+
+{id:19,ch:"第二篇　法學緒論各論",title:"刑法（既遂/障礙未遂/不能未遂/終止未遂）",tags:["重點"],
+sum:"刑法25條障礙未遂（得減輕）、26條不能未遂（不罰）、27條終止未遂（減輕或免除）",
+kps:[
+{t:"n",l:"既遂 vs 未遂的區分",pg:"",x:"<b>既遂犯</b>：完全實現構成要件（心想事成）<br><b>未遂犯</b>：著手施行，但未完全實現構成要件（心想事不成）<br><br>著手施行的重要性：著手後才有既遂/未遂問題；著手前是預備（原則不罰）<br>⚠️ 未遂犯之處罰：<b>以法律有規定者為限</b>（不是所有犯罪都罰未遂）<br>例：刑法278條重傷害→有罰未遂；277條輕傷害→沒有罰未遂"},
+{t:"n",l:"刑法25條 障礙未遂（普通未遂）★★",pg:"",x:"因外力障礙介入（非計畫中）→不得不放棄→障礙未遂<br>例：行竊誤觸警鈴→警察來→只好放棄→障礙未遂<br>例：強制性交時巡邏警察出現→只好放棄→障礙未遂<br><br>處罰：<b>得</b>（可以）減輕→不一定減輕，法官有裁量權<br>⚠️ 「未遂犯一定減輕」→錯！是「得減輕」"},
+{t:"n",l:"刑法26條 不能未遂★★",pg:"",x:"行為本質上不能發生犯罪結果，也無危險→<b>不罰</b><br>例：用空氣槍射高空飛機→根本不可能造成傷害→不能未遂→不罰<br>理由：行為人是智障，應送精神病院，不需送監獄"},
+{t:"n",l:"刑法27條 終止未遂（中止未遂）★★★",pg:"",x:"可以繼續犯罪，但<b>自己決定放棄或防止結果發生</b>→終止未遂<br>例：砍傷對方後，被他感人的話打動→自己放他走→終止未遂<br>處罰：<b>減輕或免除</b>（沒有「得」，一定減輕或免除）<br><br>準終止犯（27條第1項後段）：真誠努力防止結果，但結果還是沒發生（因為他人介入）→仍適用終止犯規定（減輕或免除）"},
+{t:"d",l:"25/26/27條比較（★★★★★必背）",pg:"",x:"25條（障礙未遂）：外力介入→<b>得</b>減輕<br>26條（不能未遂）：根本不可能發生結果→<b>不罰</b><br>27條（終止未遂）：自己放棄→<b>減輕或免除</b>（一定，無得）<br>⚠️ 「未遂犯都減輕其刑」→錯；「不能未遂得不罰」→錯（是「不罰」，不是「得不罰」）"}
+],tabs:[{title:"三種未遂比較",hd:["條文","類型","原因","處罰"],
+rows:[["25條","障礙未遂（普通未遂）","外力障礙介入，不得不放棄","得減輕（法官裁量）"],["26條","不能未遂","行為根本不可能發生犯罪結果","不罰"],["27條","終止未遂（中止未遂）","可以完成但自己決定放棄","減輕或免除（一定，無得）"]],trap:[]}],svgs:[]},
+
+{id:20,ch:"第二篇　法學緒論各論",title:"公司法（普通決議 vs 特別決議）＋ 民法債編通論",tags:["重點"],
+sum:"公司法174條普通決議vs特別決議事項、175條假決議、198條累積投票制",
+kps:[
+{t:"n",l:"股東會普通決議（公司法174條）★★",pg:"",x:"普通決議（174條）：<b>過半數乘以過半數</b>（過半數股東出席，出席者過半數同意）<br>→ 公司90%的事項都是普通決議<br><br>特別決議：需代表已發行股份總數<b>三分之二</b>乘以過半數<br>特別決議事項（需記）：<br>① 公司轉投資的限制（13條）<br>② 特別股的變更（159條）<br>③ 營業政策的重大變更（185條）<br>④ 董事的解任（199條）<br>⑤ 公司合併、解散、變更章程（277/316條）"},
+{t:"n",l:"假決議（公司法175條）★",pg:"",x:"出席股東不足174條定額，但已有<b>三分之一以上</b>出席時→可做假決議<br>前提：必須是<b>普通決議事項</b>才能做假決議（特別決議事項不可以做假決議）<br>⚠️ 選任董事也不能做假決議（因為選任董事是累積投票制，非普通決議）"},
+{t:"n",l:"累積投票制（公司法198條）★",pg:"",x:"目的：保障<b>少數派股東</b>也有參與公司決策的機會<br>機制：每股擁有的選舉權數＝應選出董事人數，可集中投給一人<br>例：持股30股，選3位董事→30×3=90票，全部投給同一人→必獲當選<br>⚠️ 累積投票制需選任兩名以上董事才能發揮功能"},
+{t:"n",l:"民法債編重要概念（債總）",pg:"",x:"侵權行為（184條）：故意或過失不法侵害他人權利→負損害賠償責任（需證明故意過失）<br>不當得利（179條）：無法律上原因取得利益→返還義務<br>無因管理（172條）：未受委託，管理他人事務→費用請求<br>連帶債務：數人負同一債務，各人都負全部履行義務（280條內部分擔）"}
+],tabs:[],svgs:[]},
+
+{id:21,ch:"第二篇　法學緒論各論",title:"刑法（共同正犯 ＋ 作為犯 vs 不作為犯）",tags:["重點"],
+sum:"同謀共同正犯、純正/不純正不作為犯、保證人地位三種來源（法定/契約/前行行為）",
+kps:[
+{t:"n",l:"共同正犯 ＋ 同謀共同正犯",pg:"",x:"共同正犯：二人以上共同實施犯罪行為<br>同謀共同正犯：未親自實施，但事先謀議，由他人實施→<b>仍成立共同正犯</b><br>例：擄人勒贖老大未持槍，但負責談贖金（繼續參與目的行為）→同謀共同正犯<br>依據：最高法院28年上字2397號判例"},
+{t:"n",l:"作為犯 vs 不作為犯",pg:"",x:"<b>作為犯</b>：透過積極行動實施犯罪（拿刀砍人）<br><b>不作為犯</b>：透過消極不行動實施犯罪<br><br>① <b>純正不作為犯</b>：只有透過不作為才能成立（如聚眾不解散→刑法149條）<br>② <b>不純正不作為犯</b>：本可用作為完成，但以不作為方式完成<br>→ 前提：行為人必須有<b>保證人地位</b>（有防止結果發生的義務）"},
+{t:"n",l:"保證人地位三種來源（★★★）",pg:"",x:"只有有保證人地位的人，才需要負不純正不作為犯的責任：<br>① <b>基於法定規定</b>：父母對未成年子女（法律規定應保護）<br>② <b>基於契約</b>：保母（與父母簽僱傭契約，有照顧義務）；主治醫師（醫病契約）<br>③ <b>基於自己前行行為</b>：肇事逃逸（撞傷別人後有義務送醫，不送→不純正不作為犯）<br><br>⚠️ 路人沒有保證人地位：隔壁嬰兒哭死→路人不負責（非父母非保母）"}
+],tabs:[],svgs:[]},
+
+{id:22,ch:"第二篇　法學緒論各論",title:"刑法（犯罪階段 ＋ 緩刑）＋ 課程總結",tags:["重點"],
+sum:"犯意/陰謀/預備/未遂/既遂犯罪階段、預備犯以法律有規定為限、因果歷程錯誤、緩刑74條",
+kps:[
+{t:"n",l:"犯罪階段（★★★）",pg:"",x:"① <b>犯意表示</b>：存在內心或向他人表示（恐嚇）→可能有罪<br>② <b>陰謀</b>：與他人互相交換犯罪計畫→<b>以法律有規定者為限</b>才處罰（陰謀犯是提前處罰）<br>③ <b>預備</b>：尚未著手，在做準備工作→<b>原則不罰</b>（法律有特別規定才罰）<br>→ 有罰預備犯：殺人罪（271條）、公共危險罪（173條）、洩漏國防秘密（109條）、劫持交通工具（185-1條）、強盜罪（328條）<br>④ <b>未遂</b>：著手施行但未實現構成要件<br>⑤ <b>既遂</b>：完全實現構成要件"},
+{t:"n",l:"因果歷程錯誤",pg:"",x:"你心中所想的致死方式（砍死）與客觀發生的致死方式（淹死）不一致<br>例：砍傷對方→對方暈倒→以為他死了→丟到河裡滅跡→結果是溺死（非刀傷致死）<br>最高法院見解：<b>仍成立殺人既遂</b>（因果歷程錯誤不阻卻殺人故意）<br>理由：你想殺他，你搞死他，就是殺人罪"},
+{t:"n",l:"緩刑（刑法74條）★",pg:"",x:"條件：受<b>2年以下</b>有期徒刑、拘役或罰金之宣告<br>緩刑期間：<b>2年以上5年以下</b><br>法官得命：道歉、賠償、向公庫支付金錢、社會勞動（74條2項）<br><br>撤銷緩刑（75條）：緩刑期間故意犯罪，受6個月以上有期徒刑確定→<b>撤銷緩刑</b><br>⚠️ 過失犯罪不撤銷緩刑，只有故意犯罪才撤銷"},
+{t:"n",l:"課程總結提醒",pg:"",x:"法學緒論是共同科目，占分比重勿花太多時間<br>重點：法系（大陸vs英美）、法律分類（公私法/實體程序法）、不確定法律概念vs行政裁量<br>刑法：未遂三種（25/26/27條）、競合（55條想像競合）、犯罪階段<br>民法：繼承順序（1138）、應繼分（1144）、離婚三種方式（1050/1052/1052之一）<br>著作權：創作保護主義、著作人格權三種（15/16/17條不得讓與繼承）"}
+],tabs:[{title:"犯罪階段一覽",hd:["階段","是否處罰","依據","例外"],
+rows:[["犯意表示","通常不罰（純內心）","—","向外表示則可能罰（如恐嚇）"],["陰謀","以法律有規定者為限","刑法109條等","一般不罰"],["預備","原則不罰","—","271/173/328條等有明文"],["未遂","以法律有規定者為限","刑法25條","271條有罰；277條未罰"],["既遂","處罰","各罪名條文","完全實現構成要件"]],trap:[]}],svgs:[]}
+];
+
+for (var i = 0; i < L11to22.length; i++) {
+  LECS.push(L11to22[i]);
+}
+
+var cur = null, cTab = "notes", cFt = "all";
+var R = new Set(JSON.parse(localStorage.getItem("ljRv1") || "[]"));
+var S = new Set(JSON.parse(localStorage.getItem("ljSv1") || "[]"));
+
+function fl() {
+  var q = document.getElementById("si").value.trim().toLowerCase();
+  var items = LECS.filter(function(l) {
+    if (cFt === "read" && !R.has(l.id)) return false;
+    if (cFt === "unread" && R.has(l.id)) return false;
+    if (cFt === "star" && !S.has(l.id)) return false;
+    if (q && l.title.toLowerCase().indexOf(q) < 0 && l.sum.toLowerCase().indexOf(q) < 0) return false;
+    return true;
+  });
+  var h = "", lc = "";
+  items.forEach(function(l) {
+    if (l.ch !== lc) { h += '<div class="chap-lbl">' + l.ch + "</div>"; lc = l.ch; }
+    var tgs = (S.has(l.id) ? ["★"] : []).concat(R.has(l.id) ? ["已讀"] : []).concat(l.tags);
+    var numStr = String(l.id).padStart(2, "0");
+    var titleHtml = q ? l.title.replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), function(m) { return "<mark>" + m + "</mark>"; }) : l.title;
+    var tagsHtml = tgs.length ? '<div class="item-tags">' + tgs.map(function(t) {
+      if (t === "已讀") return '<span class="tg tg-r">已讀</span>';
+      if (t === "★") return '<span class="tg tg-s">★ 重點</span>';
+      return '<span class="tg tg-k">' + t + "</span>";
+    }).join("") + "</div>" : "";
+    h += '<div class="item' + (cur && cur.id === l.id ? " on" : "") + '" onclick="ol(' + l.id + ')">'
+      + '<div class="item-num">' + numStr + "</div>"
+      + '<div class="item-body"><div class="item-title">' + titleHtml + "</div>" + tagsHtml + "</div>"
+      + '<div class="chk' + (R.has(l.id) ? " on" : "") + '" onclick="tr(event,' + l.id + ')">' + (R.has(l.id) ? "✓" : "") + "</div>"
+      + "</div>";
+  });
+  if (!items.length) h = '<div style="padding:20px;text-align:center;color:var(--txt3);font-size:0.92em">沒有符合的課程</div>';
+  document.getElementById("list").innerHTML = h;
+}
+function sf(f, b) { cFt = f; document.querySelectorAll(".ftab").forEach(function(x) { x.classList.remove("on"); }); b.classList.add("on"); fl(); }
+function ol(id) {
+  cur = LECS.find(function(l) { return l.id === id; });
+  cTab = "notes";
+  document.getElementById("tbt").textContent = "第" + String(id).padStart(2, "0") + "堂　" + cur.title;
+  upBtns(); rc(); fl(); document.getElementById("cs").scrollTop = 0;
+}
+function upBtns() {
+  if (!cur) return;
+  document.getElementById("sbtn").textContent = S.has(cur.id) ? "★ 已標重點" : "☆ 標重點";
+  document.getElementById("sbtn").className = "btn" + (S.has(cur.id) ? " star-on" : "");
+  document.getElementById("rbtn").textContent = R.has(cur.id) ? "✓ 已讀" : "標為已讀";
+}
+function rc() {
+  var l = cur;
+  var numStr = String(l.id).padStart(2, "0");
+  var metaStr = l.ch + " · " + (l.sum.length > 60 ? l.sum.slice(0, 60) + "…" : l.sum);
+  var notesOnClass = cTab === "notes" ? " on" : "";
+  var sumOnClass = cTab === "sum" ? " on" : "";
+  var tabHtml = "<div class=\"c-tabs\">"
+    + "<div class=\"c-tab" + notesOnClass + "\" onclick=\"st('notes')\">筆記內容</div>"
+    + "<div class=\"c-tab" + sumOnClass + "\" onclick=\"st('sum')\">課程摘要</div>"
+    + "</div>";
+  var h = "<div class=\"c-hd\"><div class=\"c-h1\">第" + numStr + "堂　" + l.title + "</div><div class=\"c-meta\">" + metaStr + "</div>" + tabHtml + "</div>";
+  h += "<div class=\"nb\">";
+  if (cTab === "notes") {
+    if (l.kps.length) {
+      h += "<div class=\"ns-hd\">重點筆記</div><div class=\"kps\">";
+      l.kps.forEach(function(k) {
+        var cls = "kp" + (k.t === "w" ? " w" : k.t === "d" ? " d" : "");
+        var pgBadge = k.pg ? "<span class=\"kp-pg\">p." + k.pg + "</span>" : "";
+        var topHtml = "<div class=\"kp-top\">" + (k.l ? "<div class=\"kp-lbl\">" + k.l + "</div>" : "<div></div>") + pgBadge + "</div>";
+        h += "<div class=\"" + cls + "\">" + topHtml + "<div class=\"kp-txt\">" + k.x + "</div></div>";
+      });
+      h += "</div>";
+    }
+    l.tabs.forEach(function(tb) {
+      h += "<div class=\"ns-hd\" style=\"margin-top:20px\">" + tb.title + "</div><div class=\"nt-wrap\"><table class=\"nt\"><thead><tr>";
+      tb.hd.forEach(function(hh) { h += "<th>" + hh + "</th>"; });
+      h += "</tr></thead><tbody>";
+      tb.rows.forEach(function(r, i) {
+        h += "<tr class=\"" + (i % 2 === 1 ? "ev" : "") + "\">";
+        r.forEach(function(c) { h += "<td>" + c + "</td>"; });
+        h += "</tr>";
+      });
+      h += "</tbody></table></div>";
+    });
+    if (!l.kps.length && !l.tabs.length) {
+      var isBlank = l.sum === "逐字稿尚未上傳";
+      h += "<div class=\"empty-note\"><div style=\"font-size:2.77em;margin-bottom:10px\">" + (isBlank ? "📤" : "✏️") + "</div>"
+        + "<div style=\"font-size:1.08em;color:var(--txt2);margin-bottom:4px\">" + (isBlank ? "逐字稿尚未上傳" : "筆記尚未新增") + "</div>"
+        + "<div style=\"font-size:0.92em;color:var(--txt3)\">上傳逐字稿後即可整理</div></div>";
+    }
+  } else {
+    h += "<div class=\"ns-hd\">課程摘要</div><div class=\"kps\"><div class=\"kp\"><div class=\"kp-txt\">" + l.sum + "</div></div></div>";
+  }
+  h += "</div>";
+  document.getElementById("cs").innerHTML = h;
+}
+function st(t) { cTab = t; rc(); }
+function tr(e, id) {
+  if (e) e.stopPropagation();
+  if (R.has(id)) R.delete(id); else R.add(id);
+  save(); up(); fl(); if (cur && cur.id === id) upBtns();
+}
+function toggleRead() { if (!cur) return; tr(null, cur.id); }
+function toggleStar() {
+  if (!cur) return;
+  if (S.has(cur.id)) S.delete(cur.id); else S.add(cur.id);
+  save(); fl(); upBtns();
+}
+function save() {
+  localStorage.setItem("ljRv1", JSON.stringify(Array.from(R)));
+  localStorage.setItem("ljSv1", JSON.stringify(Array.from(S)));
+}
+function up() {
+  var p = Math.round(R.size / LECS.length * 100);
+  document.getElementById("pf").style.width = p + "%";
+  document.getElementById("pnum").textContent = R.size + " / " + LECS.length;
+}
+function setFs(v) {
+  v = parseInt(v);
+  document.documentElement.style.setProperty("--fs", v + "px");
+  document.getElementById("fsv").textContent = v + "px";
+  document.getElementById("fsr").value = v;
+  localStorage.setItem("ljFontSize", v);
+}
+var savedFs = localStorage.getItem("ljFontSize");
+if (savedFs) { setFs(parseInt(savedFs)); }
+up(); fl(); ol(1);
+</script>
+</body>
 </html>
